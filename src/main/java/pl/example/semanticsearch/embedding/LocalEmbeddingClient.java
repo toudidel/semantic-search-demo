@@ -50,12 +50,7 @@ public class LocalEmbeddingClient implements EmbeddingClient {
     }
 
     var url = properties.baseUrl() + properties.endpoint();
-    log.info(
-        "Embedding request: POST {} Content-Type={} Content-Length={} body={}",
-        url,
-        "application/json",
-        requestBytes.length,
-        new String(requestBytes, StandardCharsets.UTF_8));
+    log.info("Embedding request: {}", new String(requestBytes, StandardCharsets.UTF_8));
 
     HttpRequest request =
         HttpRequest.newBuilder(URI.create(url))

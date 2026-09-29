@@ -1,0 +1,20 @@
+info:
+  name: "search: coś nie działa w testach"
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: http://localhost:8080/api/articles/search?q=coś nie działa w testach
+  params:
+    - name: q
+      value: coś nie działa w testach
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -1,0 +1,24 @@
+info:
+  name: create article
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/articles
+  body:
+    type: json
+    data: |-
+      {
+        "title": "BU Meeting",
+        "category": "Fincon",
+        "content": "To jest prezentacja dotycząca wyszukiwania semantycznego w Javie"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

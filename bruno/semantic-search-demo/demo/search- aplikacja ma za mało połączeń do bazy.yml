@@ -1,0 +1,24 @@
+info:
+  name: "search: aplikacja ma za mało połączeń do bazy"
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: |-
+    http://localhost:8080/api/articles/search?q=aplikacja ma za mało
+    połączeń do bazy
+  params:
+    - name: q
+      value: |-
+        aplikacja ma za mało
+        połączeń do bazy
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

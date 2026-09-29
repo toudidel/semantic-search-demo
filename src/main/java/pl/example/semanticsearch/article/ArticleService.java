@@ -1,5 +1,7 @@
 package pl.example.semanticsearch.article;
 
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,7 @@ public class ArticleService {
                     result.getContent(),
                     result.getCategory(),
                     result.getDistance(),
-                    result.getCreatedAt()))
+                    result.getCreatedAt().atOffset(ZoneOffset.UTC)))
         .toList();
   }
 
@@ -50,8 +52,8 @@ public class ArticleService {
     var inserted = 0;
     for (int offset = 0; offset < count; offset += batchSize) {
       var currentSize = Math.min(batchSize, count - offset);
-      var drafts = new java.util.ArrayList<DemoArticle>(currentSize);
-      var texts = new java.util.ArrayList<String>(currentSize);
+      var drafts = new ArrayList<DemoArticle>(currentSize);
+      var texts = new ArrayList<String>(currentSize);
 
       for (int i = 0; i < currentSize; i++) {
         var number = offset + i + 1;
@@ -61,7 +63,7 @@ public class ArticleService {
       }
 
       var embeddings = embeddingClient.embed(texts);
-      var entities = new java.util.ArrayList<ArticleEntity>(currentSize);
+      var entities = new ArrayList<ArticleEntity>(currentSize);
       for (int i = 0; i < currentSize; i++) {
         var draft = drafts.get(i);
         entities.add(

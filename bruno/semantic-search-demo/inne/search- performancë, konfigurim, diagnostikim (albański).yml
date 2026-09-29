@@ -1,0 +1,23 @@
+info:
+  name: "search: performancë, konfigurim, diagnostikim (albański)"
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: http://localhost:8080/api/articles/search?q=performancë, konfigurim, diagnostikim&limit=2
+  params:
+    - name: q
+      value: performancë, konfigurim, diagnostikim
+      type: query
+    - name: limit
+      value: "2"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
