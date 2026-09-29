@@ -1,0 +1,20 @@
+info:
+  name: add demo data
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8080/api/demo/seed?count=1
+  params:
+    - name: count
+      value: "1"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

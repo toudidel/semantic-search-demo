@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: pgvector/pgvector:pg17
+    image: pgvector/pgvector:pg18
     container_name: semantic-search-postgres
     environment:
       POSTGRES_DB: semantic_search
@@ -9,12 +9,31 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U semantic -d semantic_search"]
+      test: [ "CMD-SHELL", "pg_isready -U semantic -d semantic_search" ]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  embedding-service:
+    image: embedding-service-embedding-service:latest
+    build:
+      context: ./embedding-service
+      dockerfile: Dockerfile
+    container_name: embedding-service
+    ports:
+      - "8090:8080"
+    volumes:
+      - embedding-cache:/root/.cache/huggingface
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 10m
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  embedding-cache:

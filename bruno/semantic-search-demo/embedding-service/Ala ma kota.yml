@@ -1,0 +1,22 @@
+info:
+  name: Ala ma kota
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8090/embeddings
+  body:
+    type: json
+    data: |-
+      {
+        "text": "Ala ma kota"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
