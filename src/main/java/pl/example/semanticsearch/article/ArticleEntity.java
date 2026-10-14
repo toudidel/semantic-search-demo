@@ -29,8 +29,10 @@ public class ArticleEntity {
 
   @JdbcTypeCode(SqlTypes.VECTOR)
   @Column(nullable = false, columnDefinition = "vector(1024)")
+  // Hibernate zapisuje tablicę float jako typ pgvector o stałym wymiarze zgodnym z użytym modelem.
   private float[] embedding;
 
+  // Daty ustawia baza danych; aplikacja jedynie odczytuje ich wartość po zapisie.
   @Column(name = "created_at", insertable = false, updatable = false)
   private OffsetDateTime createdAt;
 

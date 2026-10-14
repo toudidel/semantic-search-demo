@@ -11,7 +11,7 @@ http:
     data: |-
       {
         "title": "BU Meeting",
-        "category": "Fincon",
+        "category": "FINCON",
         "content": "To jest prezentacja dotycząca wyszukiwania semantycznego w Javie"
       }
   auth: inherit

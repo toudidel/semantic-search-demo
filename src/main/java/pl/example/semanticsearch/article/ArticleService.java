@@ -21,6 +21,7 @@ public class ArticleService {
 
   @Transactional
   public long create(CreateArticleRequest request) {
+    // Model embeddingowy otrzymuje wspólną reprezentację tytułu i treści artykułu.
     var textToEmbed = request.title() + "\n" + request.content();
     var embedding = embeddingClient.embed(textToEmbed);
     var article =
@@ -31,10 +32,15 @@ public class ArticleService {
 
   @Transactional(readOnly = true)
   public List<Article> search(String query, String category, int limit) {
+    // To samo kodowanie tekstu co przy zapisie pozwala porównać sens zapytania z sensem artykułów.
     var queryVector = embeddingClient.embed(query);
     return repository
+        // pgvector przyjmuje wektor w formacie tekstowym, np. "[0.12,-0.45,...]".
+        // Limit zabezpiecza zapytanie: zwracamy od 1 do 50 wyników, niezależnie od danych
+        // wejściowych.
         .search(toPgVectorLiteral(queryVector), category, Math.min(Math.max(limit, 1), 50))
         .stream()
+        // Projekcja wyniku natywnego zapytania na model zwracany przez API.
         .map(
             result ->
                 new Article(
@@ -50,6 +56,8 @@ public class ArticleService {
   @Transactional
   public int seedDemoArticles(int count, int batchSize) {
     var inserted = 0;
+    // Generujemy i zapisujemy dane partiami, aby uniknąć pojedynczego dużego żądania do modelu i
+    // bazy.
     for (int offset = 0; offset < count; offset += batchSize) {
       var currentSize = Math.min(batchSize, count - offset);
       var drafts = new ArrayList<DemoArticle>(currentSize);
@@ -62,6 +70,8 @@ public class ArticleService {
         drafts.add(sample);
       }
 
+      // Klient obsługuje embedding wielu tekstów naraz, więc jedna partia oznacza jedno wywołanie
+      // usługi.
       var embeddings = embeddingClient.embed(texts);
       var entities = new ArrayList<ArticleEntity>(currentSize);
       for (int i = 0; i < currentSize; i++) {
@@ -76,6 +86,7 @@ public class ArticleService {
   }
 
   private String toPgVectorLiteral(float[] vector) {
+    // Arrays.toString tworzy składnię rozpoznawaną przez pgvector: [liczba,liczba,...].
     return Arrays.toString(vector);
   }
 
@@ -93,6 +104,7 @@ public class ArticleService {
     };
 
     static DemoArticle sample(int number) {
+      // Modulo rozkłada próbki równomiernie pomiędzy dostępne tematy i kategorie.
       var topic = TOPICS[(number - 1) % TOPICS.length];
       var category = CATEGORIES[(number - 1) % CATEGORIES.length];
       var variant = number % 5;

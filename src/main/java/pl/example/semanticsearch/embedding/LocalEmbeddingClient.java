@@ -20,6 +20,7 @@ public class LocalEmbeddingClient implements EmbeddingClient {
 
   private static final Logger log = LoggerFactory.getLogger(LocalEmbeddingClient.class);
 
+  // Klient JDK wysyła żądania HTTP do lokalnie uruchomionego modelu embeddingowego.
   private final HttpClient httpClient =
       HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
   private final EmbeddingProperties properties;
@@ -37,10 +38,13 @@ public class LocalEmbeddingClient implements EmbeddingClient {
 
   @Override
   public List<float[]> embed(List<String> texts) {
+    // Interfejs obsługuje wiele tekstów; obecna lokalna integracja wykonuje dla nich osobne
+    // żądania.
     return texts.stream().map(this::embed).toList();
   }
 
   private EmbeddingResponse requestEmbedding(String text) {
+    // Kontrakt lokalnego API: treść wejściowa jest przekazywana jako pole "text" w JSON-ie.
     final EmbeddingRequest requestBody = new EmbeddingRequest(text);
     final byte[] requestBytes;
     try {
@@ -49,6 +53,7 @@ public class LocalEmbeddingClient implements EmbeddingClient {
       throw new IllegalStateException("Nie można zbudować requestu embeddingu", exception);
     }
 
+    // Adres serwisu jest konfigurowalny, dzięki czemu można podmienić model bez zmiany kodu.
     var url = properties.baseUrl() + properties.endpoint();
     log.info("Embedding request: {}", new String(requestBytes, StandardCharsets.UTF_8));
 
@@ -69,6 +74,7 @@ public class LocalEmbeddingClient implements EmbeddingClient {
     }
 
     if (httpResponse.statusCode() >= 400) {
+      // Odpowiedzi błędne przerywają proces przed próbą odczytania niepoprawnego wektora.
       throw new IllegalStateException(
           "Embedding API zwróciło HTTP " + httpResponse.statusCode() + ": " + httpResponse.body());
     }
@@ -85,6 +91,7 @@ public class LocalEmbeddingClient implements EmbeddingClient {
             ? response
             : response == null ? null : response.path("embedding");
 
+    // Akceptujemy oba warianty odpowiedzi API: samą tablicę albo obiekt z polem "embedding".
     if (embedding == null || !embedding.isArray() || embedding.isEmpty()) {
       throw new IllegalStateException("Lokalny serwis embeddingów nie zwrócił wektora");
     }
@@ -98,10 +105,13 @@ public class LocalEmbeddingClient implements EmbeddingClient {
   }
 
   private float[] toVector(List<Double> values) {
+    // Wymiar musi odpowiadać kolumnie pgvector; inaczej nie da się porównywać wektorów w bazie.
     if (values.size() != properties.dimensions()) {
       throw new IllegalStateException(
           "Model zwrócił " + values.size() + " wymiarów, oczekiwano " + properties.dimensions());
     }
+    // Konwersja Double na float ogranicza rozmiar danych przechowywanych i przekazywanych do
+    // pgvector.
     var vector = new float[values.size()];
     for (int i = 0; i < values.size(); i++) {
       vector[i] = values.get(i).floatValue();

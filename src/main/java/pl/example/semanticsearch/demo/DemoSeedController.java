@@ -21,12 +21,16 @@ public class DemoSeedController {
   public SeedResponse seed(
       @RequestParam(defaultValue = "100") int count,
       @RequestParam(defaultValue = "20") int batchSize) {
+    // Limity chronią lokalny model i bazę przed przypadkowym wygenerowaniem zbyt dużego zestawu
+    // danych.
     if (count < 1 || count > 1_000) {
       throw new IllegalArgumentException("count musi być w zakresie 1..1000");
     }
     if (batchSize < 1 || batchSize > 20) {
       throw new IllegalArgumentException("batchSize musi być w zakresie 1..20");
     }
+    // Endpoint służy do szybkiego przygotowania danych potrzebnych podczas demonstracji
+    // wyszukiwania.
     var inserted = articleService.seedDemoArticles(count, batchSize);
     return new SeedResponse(inserted, batchSize, OffsetDateTime.now());
   }
